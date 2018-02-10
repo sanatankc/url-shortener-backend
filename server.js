@@ -57,4 +57,4 @@ app.get('/:shortcode', (req, res) => {
 })
 
 const port = 4567
-app.listen(port, () => console.log(`listening on port ${port}!`))
+app.listen(process.env.port || port, () => console.log(`listening on port ${port}!`))
