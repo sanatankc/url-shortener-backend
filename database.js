@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const db = mongoose
 require('dotenv').config()
-const url = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@ds263317.mlab.com:63317/urls`
+const url = process.env.DB_URL
 
 class Database {
   init() {
