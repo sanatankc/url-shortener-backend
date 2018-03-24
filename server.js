@@ -9,7 +9,7 @@ app.use(cors())
 const database = new Database()
 database.init()
 
-const BASE_URL = 'http://localhost:3765'
+const BASE_URL = 'https://short-url.now.sh'
 app.get('/new/:url(*)', (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
@@ -26,6 +26,24 @@ app.get('/new/:url(*)', (req, res) => {
     })
   }
 })
+
+app.get('/newshort/:url(*)', (req, res) => {
+  const { url } = req.params
+  if (validUrl.isUri(url)) {
+    const shortcode = shortid.generate()
+    database.save(url, shortcode, err => {
+      res.json({
+        original_url: url,
+        shortcode: `${shortcode}`,
+      })
+    })
+  } else {
+    res.json({
+      error: 'Not a valid url'
+    })
+  }
+})
+
 
 app.get('/shortcode/:shortcode', (req, res) => {
   const { shortcode } = req.params
