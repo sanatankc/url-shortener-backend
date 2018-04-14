@@ -40,7 +40,7 @@ app.get('/new/:url(*)', (req, res) => {
 app.get('/newshort/:url(*)', (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
-    shortID(shortcode => {
+    shortId(shortcode => {
       database.save(url, shortcode, err => {
         res.json({
           original_url: url,
