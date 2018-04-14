@@ -2,7 +2,6 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const validUrl = require('valid-url')
-const shortid = require('shortid')
 const Database = require('./database')
 
 app.use(cors())
@@ -10,14 +9,25 @@ const database = new Database()
 database.init()
 
 const BASE_URL = 'https://short-url.now.sh'
+
+const shortId = callback => {
+  database.getLastShortID(lastShortedId => {
+    const idNum = parseInt(lastShortedId, 36)
+    const nextIdNum = idNum + 1
+    const nextID = nextIdNum.toString(36)
+    callback(nextID)
+  })
+}
+
 app.get('/new/:url(*)', (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
-    const shortcode = shortid.generate()
-    database.save(url, shortcode, err => {
-      res.json({
-        original_url: url,
-        short_url: `${BASE_URL}/${shortcode}`,
+    shortId(shortcode => {
+      database.save(url, shortcode, err => {
+        res.json({
+          original_url: url,
+          short_url: `${BASE_URL}/${shortcode}`,
+        })
       })
     })
   } else {
@@ -30,11 +40,12 @@ app.get('/new/:url(*)', (req, res) => {
 app.get('/newshort/:url(*)', (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
-    const shortcode = shortid.generate()
-    database.save(url, shortcode, err => {
-      res.json({
-        original_url: url,
-        shortcode: `${shortcode}`,
+    shortID(shortcode => {
+      database.save(url, shortcode, err => {
+        res.json({
+          original_url: url,
+          shortcode: `${shortcode}`,
+        })
       })
     })
   } else {

@@ -4,6 +4,10 @@ require('dotenv').config()
 const url = process.env.DB_URL
 
 class Database {
+  constructor() {
+    this.getLastShortID = this.getLastShortID.bind(this)
+  }
+
   init() {
     db.connect(url)
     db.connection.on('open', () => {
@@ -35,6 +39,20 @@ class Database {
       if (callback) {
         callback(err, URL)
       }
+    })
+  }
+
+  getLastShortID(callback) {
+    this.URLModel
+      .findOne({}, 'shortcode')
+      .sort({ $natural: -1 })
+      .limit(1)
+      .exec((err, last) => {
+        if (last) {
+          callback(last.shortcode)
+        } else {
+          callback(-1)
+        }
     })
   }
 }
