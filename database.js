@@ -24,14 +24,12 @@ class Database {
     this.URLModel = mongoose.model('URL', urlSchema);
   }
 
-  save(url, shortcode, callback) {
+  async save(url, shortcode, callback) {
     const URL = new this.URLModel({ url, shortcode })
-    URL.save(err => {
-      if (err) console.error(err)
-      if (callback) {
-        callback()
-      }
-    })
+    await URL.save()
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   async findURLbyShortCode(shortcode) {

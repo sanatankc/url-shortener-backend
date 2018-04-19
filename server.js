@@ -31,11 +31,10 @@ app.get('/new/:url(*)', async (req, res) => {
   console.log(req.baseUrl)
   if (validUrl.isUri(url)) {
     const shortcode = await generateShortCode()
-    database.save(url, shortcode, err => {
-      res.json({
-        original_url: url,
-        short_url: `${req.baseUrl}/${shortcode}`,
-      })
+    await database.save(url, shortcode)
+    res.json({
+      original_url: url,
+      short_url: `${req.baseUrl}/${shortcode}`,
     })
   } else {
     res.json({
@@ -48,11 +47,10 @@ app.get('/newshort/:url(*)', async (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
     const shortcode = await generateShortCode()
-    database.save(url, shortcode, err => {
-      res.json({
-        original_url: url,
-        shortcode: `${shortcode}`,
-      })
+    await database.save(url, shortcode)
+    res.json({
+      original_url: url,
+      shortcode: `${shortcode}`,
     })
   } else {
     res.json({
