@@ -5,22 +5,15 @@ const cors = require('cors')
 const validUrl = require('valid-url')
 const database = require('./databaseInit')
 const schema = require('./schema')
-
+const generateShortCode = require('./generateShortCode')
 app.use(cors())
 
 const BASE_URL = 'https://short-url.now.sh'
 
-const generateShortCode = async callback => {
-  const lastShortedCode = await database.getLastShortID()
-  const codeNum = parseInt(lastShortedCode, 36)
-  const nextCodeNum = codeNum + 1
-  const nextcode = nextCodeNum.toString(36)
-  return nextcode
-}
 
 app.use('/graphql', expressGraphQL({
   schema,
-  graphiql: false,
+  graphiql: true,
 }))
 
 

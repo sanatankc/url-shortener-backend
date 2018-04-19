@@ -6,7 +6,9 @@ const {
   GraphQLList,
   GraphQLNonNull
 } = require('graphql')
+const validUrl = require('valid-url')
 const database = require('./databaseInit')
+const generateShortCode = require('./generateShortCode')
 
 const urls = [
   {id: '0', url: 'https://google.com', shortcode: '0'},
@@ -19,7 +21,8 @@ const UrlType = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLString},
     url: {type: GraphQLString},
-    shortcode: {type: GraphQLString}
+    shortcode: {type: GraphQLString},
+    error: {type: GraphQLString}
   })
 })
 
@@ -34,12 +37,39 @@ const RootQuery = new GraphQLObjectType({
         }
       },
       resolve(parentValue, args) {
-        return database.findURLbyShortCode(args.shortcode)
+         return database.findURLbyShortCode(args.shortcode)
+      }
+    },
+  }
+})
+
+const Mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    url: {
+      type: UrlType,
+      args: {
+        url: {
+          type: new GraphQLNonNull(GraphQLString)
+        }
+      },
+      resolve: async (parentValue, args) => {
+        const { url } = args
+         if (!validUrl.isUri(url)) {
+            return {
+              error: 'Not a valid url'
+            }
+         } else {
+           const shortcode = await generateShortCode()
+           await database.save(url, shortcode)
+           return { shortcode, url }
+         }
       }
     },
   }
 })
 
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 })
