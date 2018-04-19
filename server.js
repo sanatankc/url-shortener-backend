@@ -12,13 +12,12 @@ database.init()
 
 const BASE_URL = 'https://short-url.now.sh'
 
-const shortId = callback => {
-  database.getLastShortID(lastShortedId => {
-    const idNum = parseInt(lastShortedId, 36)
-    const nextIdNum = idNum + 1
-    const nextID = nextIdNum.toString(36)
-    callback(nextID)
-  })
+const generateShortCode = async callback => {
+  const lastShortedCode = await database.getLastShortID()
+  const codeNum = parseInt(lastShortedCode, 36)
+  const nextCodeNum = codeNum + 1
+  const nextcode = nextCodeNum.toString(36)
+  return nextcode
 }
 
 app.use('/graphql', expressGraphQL({
@@ -27,15 +26,15 @@ app.use('/graphql', expressGraphQL({
 }))
 
 
-app.get('/new/:url(*)', (req, res) => {
+app.get('/new/:url(*)', async (req, res) => {
   const { url } = req.params
+  console.log(req.baseUrl)
   if (validUrl.isUri(url)) {
-    shortId(shortcode => {
-      database.save(url, shortcode, err => {
-        res.json({
-          original_url: url,
-          short_url: `${req.baseUrl}/${shortcode}`,
-        })
+    const shortcode = await generateShortCode()
+    database.save(url, shortcode, err => {
+      res.json({
+        original_url: url,
+        short_url: `${req.baseUrl}/${shortcode}`,
       })
     })
   } else {
@@ -45,15 +44,14 @@ app.get('/new/:url(*)', (req, res) => {
   }
 })
 
-app.get('/newshort/:url(*)', (req, res) => {
+app.get('/newshort/:url(*)', async (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
-    shortId(shortcode => {
-      database.save(url, shortcode, err => {
-        res.json({
-          original_url: url,
-          shortcode: `${shortcode}`,
-        })
+    const shortcode = await generateShortCode()
+    database.save(url, shortcode, err => {
+      res.json({
+        original_url: url,
+        shortcode: `${shortcode}`,
       })
     })
   } else {

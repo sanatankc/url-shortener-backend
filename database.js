@@ -39,18 +39,18 @@ class Database {
     return URL
   }
 
-  getLastShortID(callback) {
-    this.URLModel
+  async getLastShortID(callback) {
+    const lastShortedURL = await this.URLModel
       .findOne({}, 'shortcode')
       .sort({ $natural: -1 })
       .limit(1)
-      .exec((err, last) => {
-        if (last) {
-          callback(last.shortcode)
-        } else {
-          callback(-1)
-        }
-    })
+      .exec()
+
+    if (lastShortedURL) {
+      return lastShortedURL.shortcode
+    } else {
+      return -1
+    }
   }
 }
 
