@@ -1,8 +1,10 @@
 const express = require('express')
+const expressGraphQL = require('express-graphql')
 const app = express()
 const cors = require('cors')
 const validUrl = require('valid-url')
 const Database = require('./database')
+const schema = require('./schema')
 
 app.use(cors())
 const database = new Database()
@@ -19,6 +21,12 @@ const shortId = callback => {
   })
 }
 
+app.use('/graphql', expressGraphQL({
+  schema,
+  graphiql: true,
+}))
+
+
 app.get('/new/:url(*)', (req, res) => {
   const { url } = req.params
   if (validUrl.isUri(url)) {
@@ -26,7 +34,7 @@ app.get('/new/:url(*)', (req, res) => {
       database.save(url, shortcode, err => {
         res.json({
           original_url: url,
-          short_url: `${BASE_URL}/${shortcode}`,
+          short_url: `${req.baseUrl}/${shortcode}`,
         })
       })
     })
