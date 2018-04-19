@@ -33,6 +33,7 @@ class Database {
   }
 
   async findURLbyShortCode(shortcode) {
+    console.log(this.URLModel)
     const URL = await this.URLModel.findOne({ shortcode }, 'url shortcode').exec()
     return URL
   }

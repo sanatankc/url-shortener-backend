@@ -6,13 +6,12 @@ const {
   GraphQLList,
   GraphQLNonNull
 } = require('graphql')
-
-const Database = require('./database')
+const database = require('./databaseInit')
 
 const urls = [
-  {id: '0', url: 'https://google.com', shortCode: '0'},
-  {id: '1', url: 'https://googlde.com', shortCode: '1'},
-  {id: '2', url: 'https://goode.com', shortCode: '2'},
+  {id: '0', url: 'https://google.com', shortcode: '0'},
+  {id: '1', url: 'https://googlde.com', shortcode: '1'},
+  {id: '2', url: 'https://goode.com', shortcode: '2'},
 ]
 
 const UrlType = new GraphQLObjectType({
@@ -20,7 +19,7 @@ const UrlType = new GraphQLObjectType({
   fields: () => ({
     id: {type: GraphQLString},
     url: {type: GraphQLString},
-    shortCode: {type: GraphQLString}
+    shortcode: {type: GraphQLString}
   })
 })
 
@@ -30,35 +29,14 @@ const RootQuery = new GraphQLObjectType({
     url: {
       type: UrlType,
       args: {
-        shortCode: {
+        shortcode: {
           type: GraphQLString
         }
       },
       resolve(parentValue, args) {
-        for (let url of urls) {
-          if (url.shortCode === args.shortCode) {
-            return url
-          }
-        }
+        return database.findURLbyShortCode(args.shortcode)
       }
     },
-
-    shortCode: {
-      type: UrlType,
-      args: {
-        url: {
-          type: GraphQLString
-        }
-      },
-      resolve(parentValue, args) {
-        for (let url of urls) {
-          if (url.url === args.url) {
-            return url
-          }
-        }
-      }
-    },
-
   }
 })
 

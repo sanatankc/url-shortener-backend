@@ -3,12 +3,10 @@ const expressGraphQL = require('express-graphql')
 const app = express()
 const cors = require('cors')
 const validUrl = require('valid-url')
-const Database = require('./database')
+const database = require('./databaseInit')
 const schema = require('./schema')
 
 app.use(cors())
-const database = new Database()
-database.init()
 
 const BASE_URL = 'https://short-url.now.sh'
 
@@ -22,7 +20,7 @@ const generateShortCode = async callback => {
 
 app.use('/graphql', expressGraphQL({
   schema,
-  graphiql: true,
+  graphiql: false,
 }))
 
 
