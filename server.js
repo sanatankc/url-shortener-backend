@@ -64,33 +64,41 @@ app.get('/newshort/:url(*)', (req, res) => {
 })
 
 
-app.get('/shortcode/:shortcode', (req, res) => {
+app.get('/shortcode/:shortcode', async (req, res) => {
   const { shortcode } = req.params
-  database.findURLbyShortCode(shortcode, (err, URL) => {
-    if (err || URL === null) {
-      res.json({
-        error: 'URL not found'
-      })
-    } else {
+  try {
+    const URL = await database.findURLbyShortCode(shortcode)
+    if (URL !== null) {
       res.json({
         original_url: URL.url,
         shortcode: shortcode,
       })
+    } else {
+      res.json({
+        error: 'URL not found'
+      })
     }
-  })
+  } catch(e) {
+    res.json({
+      error: 'Database Error'
+    })
+  }
 })
 
-app.get('/:shortcode', (req, res) => {
+app.get('/:shortcode', async (req, res) => {
   const { shortcode } = req.params
-  database.findURLbyShortCode(shortcode, (err, URL) => {
-    if (err || URL === null) {
+  try {
+    const URL = await database.findURLbyShortCode(shortcode)
+    if (URL === null) {
       res.json({
         error: 'URL not found'
       })
     } else {
       res.redirect(URL.url)
     }
-  })
+  } catch(e) {
+    res.send('Database Error')
+  }
 })
 
 const port = 4567

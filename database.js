@@ -34,12 +34,9 @@ class Database {
     })
   }
 
-  findURLbyShortCode(shortcode, callback) {
-    this.URLModel.findOne({ shortcode }, 'url shortcode', (err, URL) => {
-      if (callback) {
-        callback(err, URL)
-      }
-    })
+  async findURLbyShortCode(shortcode) {
+    const URL = await this.URLModel.findOne({ shortcode }, 'url shortcode').exec()
+    return URL
   }
 
   getLastShortID(callback) {
