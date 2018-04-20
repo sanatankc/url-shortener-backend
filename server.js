@@ -19,7 +19,6 @@ app.use('/graphql', expressGraphQL({
 
 app.get('/new/:url(*)', async (req, res) => {
   const { url } = req.params
-  console.log(req.baseUrl)
   if (validUrl.isUri(url)) {
     const shortcode = await generateShortCode()
     await database.save(url, shortcode)
