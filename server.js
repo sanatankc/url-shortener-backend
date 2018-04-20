@@ -13,7 +13,7 @@ const BASE_URL = 'https://short-url.now.sh'
 
 app.use('/graphql', expressGraphQL({
   schema,
-  graphiql: true,
+  graphiql: false,
 }))
 
 
